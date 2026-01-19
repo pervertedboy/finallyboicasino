@@ -12,6 +12,7 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
         }
         
         html {
@@ -126,8 +127,8 @@
             background: rgba(50, 205, 50, 0.3);
             border: 2px solid #32cd32;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -136,6 +137,7 @@
             font-size: 1.2em;
             color: #32cd32;
             flex-shrink: 0;
+            user-select: none;
         }
         
         .control-btn:active {
@@ -336,7 +338,7 @@
             background: rgba(50, 205, 50, 0.3);
             border: 2px solid #32cd32;
             border-radius: 25px;
-            padding: 10px 20px;
+            padding: 12px 20px;
             color: #32cd32;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -346,11 +348,13 @@
             margin: 10px 0;
             font-weight: bold;
             font-size: 0.95em;
+            user-select: none;
+            min-height: 44px;
         }
         
         .table-toggle:active {
             background: rgba(50, 205, 50, 0.5);
-            transform: scale(0.98);
+            transform: scale(0.95);
         }
         
         /* Кнопки ввода */
@@ -364,13 +368,13 @@
         }
         
         .input-btn {
-            width: clamp(55px, 18vw, 70px);
-            height: clamp(55px, 18vw, 70px);
-            font-size: clamp(1.6em, 7vw, 2.2em);
+            width: clamp(60px, 20vw, 80px);
+            height: clamp(60px, 20vw, 80px);
+            font-size: clamp(1.8em, 8vw, 2.5em);
             background: rgba(50, 205, 50, 0.2);
             color: #32cd32;
             border: 2px solid #32cd32;
-            border-radius: 12px;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.2s ease;
             font-weight: bold;
@@ -378,11 +382,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
         }
         
         .input-btn:active {
-            background: rgba(50, 205, 50, 0.4);
-            transform: scale(0.95);
+            background: rgba(50, 205, 50, 0.5);
+            transform: scale(0.92);
         }
         
         .input-btn.clear {
@@ -451,8 +457,8 @@
         }
         
         .btn {
-            padding: 14px 25px;
-            font-size: clamp(0.85em, 3.2vw, 1em);
+            padding: 15px 20px;
+            font-size: clamp(0.9em, 3.5vw, 1em);
             border: none;
             border-radius: 50px;
             cursor: pointer;
@@ -467,14 +473,19 @@
             position: relative;
             overflow: hidden;
             flex: 1 1 45%;
-            min-width: 140px;
+            min-width: 150px;
+            min-height: 55px;
             max-width: 200px;
             white-space: nowrap;
             text-overflow: ellipsis;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .btn:active {
-            transform: scale(0.98);
+            transform: scale(0.96);
             box-shadow: 0 2px 10px rgba(50, 205, 50, 0.5);
         }
         
@@ -634,7 +645,7 @@
         /* Магазин клетки */
         .shop {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 12px;
             margin: 25px 0;
             padding: 0 10px;
@@ -650,12 +661,16 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            user-select: none;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .shop-item:active {
-            background: rgba(50, 205, 50, 0.25);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(50, 205, 50, 0.3);
+            background: rgba(50, 205, 50, 0.3);
+            transform: scale(0.97);
         }
         
         .shop-item.bought {
@@ -667,7 +682,6 @@
         .shop-item.bought:active {
             transform: none;
             background: rgba(0, 20, 0, 0.5);
-            box-shadow: none;
         }
         
         .shop-icon {
@@ -697,6 +711,7 @@
             font-size: 0.9em;
             font-weight: bold;
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin-top: auto;
         }
         
         /* Положение частей клетки */
@@ -706,16 +721,43 @@
         .golgi { top: 65%; left: 15%; width: 55px; height: 45px; }
         .er { top: 40%; left: 40%; width: 85px; height: 85px; }
         
+        /* Исправления для мобильных касаний */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:active, .input-btn:active, .control-btn:active, 
+            .shop-item:active, .table-toggle:active {
+                transform: scale(0.95) !important;
+                transition: transform 0.1s ease !important;
+            }
+            
+            .input-btn:active {
+                background: rgba(50, 205, 50, 0.4) !important;
+            }
+            
+            .input-btn.clear:active {
+                background: rgba(255, 100, 100, 0.5) !important;
+            }
+            
+            .shop-item:active {
+                background: rgba(50, 205, 50, 0.25) !important;
+            }
+            
+            /* Улучшаем отклик на касание */
+            .game-board * {
+                -webkit-tap-highlight-color: rgba(50, 205, 50, 0.3);
+            }
+        }
+        
         /* Адаптация под очень маленькие экраны */
         @media (max-width: 320px) {
             .slot, .answer-slot, .input-btn {
-                width: 50px;
-                height: 50px;
+                width: 55px;
+                height: 55px;
                 font-size: 1.6em;
             }
             
             .btn {
-                min-width: 120px;
+                min-width: 130px;
+                min-height: 50px;
                 padding: 12px 15px;
                 font-size: 0.8em;
             }
@@ -735,8 +777,8 @@
             }
             
             .control-btn {
-                width: 35px;
-                height: 35px;
+                width: 40px;
+                height: 40px;
                 font-size: 1em;
             }
             
@@ -771,8 +813,8 @@
             }
             
             .slot, .answer-slot, .input-btn {
-                width: 45px;
-                height: 45px;
+                width: 50px;
+                height: 50px;
                 font-size: 1.6em;
             }
             
@@ -782,9 +824,14 @@
             }
             
             .btn {
-                padding: 8px 12px;
+                padding: 10px 12px;
                 font-size: 0.75em;
-                min-width: 100px;
+                min-width: 120px;
+                min-height: 45px;
+            }
+            
+            .shop {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
         }
         
@@ -804,6 +851,7 @@
             
             .btn {
                 min-width: 160px;
+                min-height: 60px;
                 padding: 16px 30px;
                 font-size: 1em;
             }
@@ -1150,9 +1198,61 @@
             createShopItems();
             setupAudioControls();
             setupTableToggle();
+            setupMobileTouch();
             updateStats();
             startBackgroundMusic();
             spin();
+        }
+
+        // Настройка мобильных касаний
+        function setupMobileTouch() {
+            // Для всех интерактивных элементов
+            const interactiveElements = document.querySelectorAll('.btn, .input-btn, .control-btn, .table-toggle, .shop-item');
+            
+            interactiveElements.forEach(el => {
+                // Предотвращаем выделение текста при долгом нажатии
+                el.style.userSelect = 'none';
+                el.style.webkitUserSelect = 'none';
+                
+                // Добавляем touch-события
+                el.addEventListener('touchstart', handleTouchStart, { passive: true });
+                el.addEventListener('touchend', handleTouchEnd, { passive: true });
+                el.addEventListener('touchcancel', handleTouchCancel, { passive: true });
+                
+                // Убираем стандартное поведение браузера
+                el.addEventListener('touchmove', function(e) {
+                    if (e.cancelable) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            });
+        }
+
+        function handleTouchStart(e) {
+            const btn = e.currentTarget;
+            btn.style.transform = 'scale(0.95)';
+            
+            // Для кнопок ввода нуклеотидов
+            if (btn.classList.contains('input-btn') && !btn.classList.contains('clear')) {
+                btn.style.backgroundColor = 'rgba(50, 205, 50, 0.4)';
+            }
+        }
+
+        function handleTouchEnd(e) {
+            const btn = e.currentTarget;
+            btn.style.transform = '';
+            btn.style.backgroundColor = '';
+            
+            // Вызываем оригинальный клик
+            setTimeout(() => {
+                btn.click();
+            }, 50);
+        }
+
+        function handleTouchCancel(e) {
+            const btn = e.currentTarget;
+            btn.style.transform = '';
+            btn.style.backgroundColor = '';
         }
 
         // Настройка аудио контролов
@@ -1267,10 +1367,12 @@
                 setTimeout(() => {
                     backgroundMusic.play().catch(e => {
                         console.log("Фоновая музыка: требуется взаимодействие пользователя");
-                        document.addEventListener('click', function enableMusic() {
+                        // Активируем музыку при первом касании
+                        const activateMusic = () => {
                             backgroundMusic.play();
-                            document.removeEventListener('click', enableMusic);
-                        }, { once: true });
+                            document.removeEventListener('touchstart', activateMusic);
+                        };
+                        document.addEventListener('touchstart', activateMusic, { once: true });
                     });
                 }, 1000);
             }
@@ -1606,7 +1708,6 @@
                 if (gameState.cellParts[partId]) {
                     item.classList.add('bought');
                     item.innerHTML += '<div style="color: #00ff00; margin-top: 8px; font-weight: bold; font-size: 0.8em;">✅ КУПЛЕНО</div>';
-                    item.onclick = null;
                 } else if (gameState.proteins >= cost) {
                     item.classList.remove('bought');
                     item.onclick = () => buyCellPart(partId, cost);
@@ -1681,13 +1782,6 @@
         clearBtn.addEventListener('click', clearRNAInput);
         cellBtn.addEventListener('click', goToCellScreen);
         backToGameBtn.addEventListener('click', goToGameScreen);
-
-        // Оптимизация для мобильных
-        document.addEventListener('touchstart', function(e) {
-            if (e.target.classList.contains('btn') || e.target.classList.contains('input-btn')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
 
         // Автоматическое отключение звука
         document.addEventListener('visibilitychange', function() {
