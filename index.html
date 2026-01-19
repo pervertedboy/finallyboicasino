@@ -1189,6 +1189,9 @@
 
         // Нуклеотиды иРНК
         const rnaNucleotides = ['У', 'А', 'Г', 'Ц'];
+        
+        // Флаг для предотвращения двойного нажатия
+        let touchInProgress = false;
 
         // Инициализация игры
         function initGame() {
@@ -1204,55 +1207,36 @@
             spin();
         }
 
-        // Настройка мобильных касаний
+        // Настройка мобильных касаний - УПРОЩЕННАЯ ВЕРСИЯ
         function setupMobileTouch() {
-            // Для всех интерактивных элементов
-            const interactiveElements = document.querySelectorAll('.btn, .input-btn, .control-btn, .table-toggle, .shop-item');
+            // Только добавляем визуальную обратную связь для касаний
+            // Основные обработчики оставляем как есть (click)
             
-            interactiveElements.forEach(el => {
-                // Предотвращаем выделение текста при долгом нажатии
-                el.style.userSelect = 'none';
-                el.style.webkitUserSelect = 'none';
-                
-                // Добавляем touch-события
-                el.addEventListener('touchstart', handleTouchStart, { passive: true });
-                el.addEventListener('touchend', handleTouchEnd, { passive: true });
-                el.addEventListener('touchcancel', handleTouchCancel, { passive: true });
-                
-                // Убираем стандартное поведение браузера
-                el.addEventListener('touchmove', function(e) {
-                    if (e.cancelable) {
-                        e.preventDefault();
+            const addTouchFeedback = (element) => {
+                element.addEventListener('touchstart', function(e) {
+                    this.style.transform = 'scale(0.95)';
+                    if (this.classList.contains('input-btn') && !this.classList.contains('clear')) {
+                        this.style.backgroundColor = 'rgba(50, 205, 50, 0.4)';
                     }
-                }, { passive: false });
-            });
-        }
-
-        function handleTouchStart(e) {
-            const btn = e.currentTarget;
-            btn.style.transform = 'scale(0.95)';
+                }, { passive: true });
+                
+                element.addEventListener('touchend', function(e) {
+                    this.style.transform = '';
+                    this.style.backgroundColor = '';
+                }, { passive: true });
+                
+                element.addEventListener('touchcancel', function(e) {
+                    this.style.transform = '';
+                    this.style.backgroundColor = '';
+                }, { passive: true });
+            };
             
-            // Для кнопок ввода нуклеотидов
-            if (btn.classList.contains('input-btn') && !btn.classList.contains('clear')) {
-                btn.style.backgroundColor = 'rgba(50, 205, 50, 0.4)';
-            }
-        }
-
-        function handleTouchEnd(e) {
-            const btn = e.currentTarget;
-            btn.style.transform = '';
-            btn.style.backgroundColor = '';
-            
-            // Вызываем оригинальный клик
-            setTimeout(() => {
-                btn.click();
-            }, 50);
-        }
-
-        function handleTouchCancel(e) {
-            const btn = e.currentTarget;
-            btn.style.transform = '';
-            btn.style.backgroundColor = '';
+            // Добавляем обратную связь только для кнопок ввода
+            document.querySelectorAll('.input-btn').forEach(addTouchFeedback);
+            document.querySelectorAll('.btn').forEach(addTouchFeedback);
+            document.querySelectorAll('.control-btn').forEach(addTouchFeedback);
+            document.querySelectorAll('.table-toggle').forEach(addTouchFeedback);
+            document.querySelectorAll('.shop-item').forEach(addTouchFeedback);
         }
 
         // Настройка аудио контролов
@@ -1538,13 +1522,19 @@
             }, 1000);
         }
 
-        // Добавление нуклеотида иРНК
+        // Добавление нуклеотида иРНК с защитой от двойного нажатия
         function addRNANucleotide(nuc) {
-            if (gameState.currentPosition >= 3) return;
+            if (gameState.currentPosition >= 3 || touchInProgress) return;
             
+            touchInProgress = true;
             gameState.userRNA[gameState.currentPosition] = nuc;
             updateRNADisplay();
             updateCurrentPosition(gameState.currentPosition + 1);
+            
+            // Сбрасываем флаг через небольшую задержку
+            setTimeout(() => {
+                touchInProgress = false;
+            }, 100);
         }
 
         // Обновление отображения иРНК
@@ -1776,7 +1766,7 @@
             }
         }
 
-        // Обработчики событий
+        // Обработчики событий - ТОЛЬКО CLICK
         spinBtn.addEventListener('click', spin);
         checkBtn.addEventListener('click', checkAnswer);
         clearBtn.addEventListener('click', clearRNAInput);
