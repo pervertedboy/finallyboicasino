@@ -121,6 +121,47 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(50, 205, 50, 0.4);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            max-width: 300px;
+        }
+        
+        .top-controls.collapsed {
+            padding: 8px;
+            width: 44px;
+            overflow: hidden;
+        }
+        
+        .top-controls.collapsed .control-content {
+            display: none;
+        }
+        
+        .toggle-controls-btn {
+            background: rgba(50, 205, 50, 0.3);
+            border: 2px solid #32cd32;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2em;
+            color: #32cd32;
+            flex-shrink: 0;
+            user-select: none;
+        }
+        
+        .toggle-controls-btn:active {
+            background: rgba(50, 205, 50, 0.5);
+            transform: scale(0.95);
+        }
+        
+        .control-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.3s ease;
         }
         
         .control-btn {
@@ -833,6 +874,15 @@
             .shop {
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
+            
+            .top-controls.collapsed {
+                width: 40px;
+            }
+            
+            .toggle-controls-btn {
+                width: 40px;
+                height: 40px;
+            }
         }
         
         /* Большие экраны */
@@ -897,18 +947,23 @@
     </audio>
     
     <!-- Панель управления -->
-    <div class="top-controls">
-        <button class="control-btn" id="musicToggle" title="Музыка вкл/выкл">
-            🔊
+    <div class="top-controls" id="topControls">
+        <button class="toggle-controls-btn" id="toggleControlsBtn">
+            ⚙️
         </button>
-        <button class="control-btn" id="soundToggle" title="Звуки вкл/выкл">
-            💥
-        </button>
-        <button class="control-btn" id="tableToggle" title="Таблица комплиментарности">
-            📋
-        </button>
-        <div class="volume-slider">
-            <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.5">
+        <div class="control-content">
+            <button class="control-btn" id="musicToggle" title="Музыка вкл/выкл">
+                🔊
+            </button>
+            <button class="control-btn" id="soundToggle" title="Звуки вкл/выкл">
+                💥
+            </button>
+            <button class="control-btn" id="tableToggle" title="Таблица комплиментарности">
+                📋
+            </button>
+            <div class="volume-slider">
+                <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.5">
+            </div>
         </div>
     </div>
     
@@ -1137,7 +1192,8 @@
                 golgi: false,
                 er: false
             },
-            tableVisible: false
+            tableVisible: false,
+            controlsCollapsed: false
         };
 
         // Настройки аудио
@@ -1168,16 +1224,18 @@
         const tableToggleText = document.getElementById('tableToggleText');
         const tableToggleControl = document.getElementById('tableToggle');
         
+        // Элементы управления
+        const topControls = document.getElementById('topControls');
+        const toggleControlsBtn = document.getElementById('toggleControlsBtn');
+        const musicToggle = document.getElementById('musicToggle');
+        const soundToggle = document.getElementById('soundToggle');
+        const volumeControl = document.getElementById('volumeControl');
+        
         // Аудио элементы
         const backgroundMusic = document.getElementById('backgroundMusic');
         const spinSound = document.getElementById('spinSound');
         const correctSound = document.getElementById('correctSound');
         const wrongSound = document.getElementById('wrongSound');
-        
-        // Контроль аудио
-        const musicToggle = document.getElementById('musicToggle');
-        const soundToggle = document.getElementById('soundToggle');
-        const volumeControl = document.getElementById('volumeControl');
         
         // Экран клетки
         const gameScreen = document.getElementById('gameScreen');
@@ -1201,10 +1259,41 @@
             createShopItems();
             setupAudioControls();
             setupTableToggle();
+            setupControlsToggle();
             setupMobileTouch();
             updateStats();
             startBackgroundMusic();
             spin();
+        }
+
+        // Настройка переключения панели управления
+        function setupControlsToggle() {
+            // Загружаем сохраненное состояние
+            const savedControlsState = localStorage.getItem('controlsCollapsed');
+            if (savedControlsState !== null) {
+                gameState.controlsCollapsed = savedControlsState === 'true';
+                if (gameState.controlsCollapsed) {
+                    topControls.classList.add('collapsed');
+                    toggleControlsBtn.textContent = '⚙️';
+                }
+            }
+            
+            toggleControlsBtn.addEventListener('click', toggleControls);
+        }
+
+        // Переключение панели управления
+        function toggleControls() {
+            gameState.controlsCollapsed = !gameState.controlsCollapsed;
+            
+            if (gameState.controlsCollapsed) {
+                topControls.classList.add('collapsed');
+                toggleControlsBtn.textContent = '⚙️';
+            } else {
+                topControls.classList.remove('collapsed');
+                toggleControlsBtn.textContent = '⬅️';
+            }
+            
+            localStorage.setItem('controlsCollapsed', gameState.controlsCollapsed);
         }
 
         // Настройка мобильных касаний - УПРОЩЕННАЯ ВЕРСИЯ
@@ -1237,6 +1326,7 @@
             document.querySelectorAll('.control-btn').forEach(addTouchFeedback);
             document.querySelectorAll('.table-toggle').forEach(addTouchFeedback);
             document.querySelectorAll('.shop-item').forEach(addTouchFeedback);
+            addTouchFeedback(toggleControlsBtn);
         }
 
         // Настройка аудио контролов
